@@ -140,7 +140,7 @@ def draw_danmu():
         text_fmt = my_font.render(DANMU_TEXT, 1, (255,255,255))
         text_width, text_height = my_font.size(DANMU_TEXT)
         screen.blit(text_fmt, (DANMU_X,60))
-        DANMU_X-=5
+        DANMU_X-=10
         if DANMU_X<-text_width:
             DANMU_ISSHOW = 0
             DANMU_ISRUNNING = 0
