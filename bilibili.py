@@ -77,26 +77,28 @@ async def getBilibiliFansCount():
 
     try:
         async with httpx.AsyncClient() as client:
-            res = requests.get('https://api.bilibili.com/x/space/acc/info?mid='+BILI_MID)
+            res = await client.get('https://api.bilibili.com/x/space/acc/info?mid='+BILI_MID)
             data = res.json()
             BILI_LIVEID = data['data']['live_room']['roomid']
             BILI_LIVEONLINE = data['data']['live_room']['online']
     except:
         BILI_LIVEONLINE = 0
 
-    # try:
-    #     res = requests.get('http://api.bilibili.com/x/space/upstat', cookies={
-    #         'SESSDATA':BILI_SESSDATA
-    #     }, data={
-    #         'mid':BILI_MID
-    #     })
-    #     data = res.json()
-    #     print(data)
-    #     BILI_TOTALVIEW = data['data']['archive']['view']
-    #     BILI_TOTALLIKE = data['data']['likes']
-    # except:
-    #     BILI_TOTALVIEW = 0
-    #     BILI_TOTALLIKE = 0
+    try:
+        async with httpx.AsyncClient() as client:
+            res = await client.get('http://api.bilibili.com/x/space/upstat', cookies={
+                'SESSDATA':BILI_SESSDATA
+            },params={
+                'mid':BILI_MID
+            },headers={
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36'
+            })
+            data = res.json()
+            BILI_TOTALVIEW = data['data']['archive']['view']
+            BILI_TOTALLIKE = data['data']['likes']
+    except:
+        BILI_TOTALVIEW = 0
+        BILI_TOTALLIKE = 0
 
     try:
         async with httpx.AsyncClient() as client:
@@ -195,7 +197,7 @@ def draw_bilibili():
     text_width, text_height = my_font.size("未读消息："+str(BILI_UNREAD))
     screen.blit(text_fmt, (10,SCREEN_HEIGHT-10-text_height))
 
-    totalstr = " 总充电："+str(BILI_TOTALELEC)+" 直播间人气："+str(BILI_LIVEONLINE)
+    totalstr = " 总播放："+str(BILI_TOTALVIEW)+" 总获赞："+str(BILI_TOTALLIKE)+" 总充电："+str(BILI_TOTALELEC)+" 直播间人气："+str(BILI_LIVEONLINE)
     my_font = pygame.font.Font(FONT_PATH, 20)
     text_fmt = my_font.render(totalstr, 1, (255,255,255))
     text_width, text_height = my_font.size(totalstr)
@@ -251,11 +253,6 @@ def run_game():
     image_logo = pygame.transform.scale(image_logo, (300, 300))
 
     requestBiliData()
-
-    # global DANMU_ISSHOW
-    # global DANMU_TEXT
-    # DANMU_ISSHOW = 1
-    # DANMU_TEXT = "哈哈哈哈哈"
 
     # game loop
     while True:
