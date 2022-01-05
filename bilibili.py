@@ -30,10 +30,14 @@ def get_host_ip():
     return ip
 
 def getBilibiliFansCount():
-    res = requests.get('https://api.bilibili.com/x/relation/stat?vmid=422646817')
-    data = res.json()
     global BILI_FANSCOUNT
-    BILI_FANSCOUNT = str(data['data']['follower'])
+    try:
+        res = requests.get('https://api.bilibili.com/x/relation/stat?vmid=422646817')
+        data = res.json()
+        
+        BILI_FANSCOUNT = str(data['data']['follower'])
+    except:
+        BILI_FANSCOUNT = "0"
 
 def draw_time():
     date_str = time.strftime("%Y 年 %m 月 %d 日", time.localtime())
@@ -59,8 +63,7 @@ def draw_ip():
     screen.blit(text_fmt, (SCREEN_WIDTH-text_width-10,10))
 
 def draw_bilibili():
-    image_logo = pygame.image.load(CUR_PATH+"/icon_bilibili.jpg")
-    image_logo = pygame.transform.scale(image_logo, (300, 300))
+    
     screen.blit(image_logo, (30,50))
 
     my_font = pygame.font.Font(FONT_PATH, 220)
@@ -91,6 +94,7 @@ def game_loop():
 
 def run_game():
     pygame.init()
+    pygame.mouse.set_visible(0)
 
     global screen
     screen = pygame.display.set_mode((0, 0), pygame.NOFRAME)
@@ -100,6 +104,10 @@ def run_game():
     global SECOND_EVT
     SECOND_EVT = pygame.USEREVENT +1
     pygame.time.set_timer(SECOND_EVT,1000)
+
+    global image_logo
+    image_logo = pygame.image.load(CUR_PATH+"/icon_bilibili.jpg")
+    image_logo = pygame.transform.scale(image_logo, (300, 300))
 
     getBilibiliFansCount()
 
