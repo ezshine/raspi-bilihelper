@@ -158,7 +158,7 @@ def requestBiliData():
 
 def draw_time():
     date_str = time.strftime("%Y 年 %m 月 %d 日", time.localtime())
-    hm_str = time.strftime("%H %M", time.localtime())
+    hm_str = time.strftime("%H:%M", time.localtime())
     second_str = time.strftime("%S", time.localtime())
 
     my_font = pygame.font.Font(FONT_PATH, 20)
@@ -167,12 +167,12 @@ def draw_time():
 
     my_font = pygame.font.Font(FONT_PATH, 20)
     text_fmt = my_font.render(hm_str, 1, (255,255,255))
+    text_width, text_height = my_font.size(hm_str)
     screen.blit(text_fmt, (240,10))
 
-    if TIME_SECOND%2==0:
-        my_font = pygame.font.Font(FONT_PATH, 20)
-        text_fmt = my_font.render(":", 1, (255,255,255))
-        screen.blit(text_fmt, (262,10))
+    my_font = pygame.font.Font(FONT_PATH, 14)
+    text_fmt = my_font.render(second_str, 1, (255,255,255))
+    screen.blit(text_fmt, (240+text_width+10,17))
 
 def draw_ip():
     try:
