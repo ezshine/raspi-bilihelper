@@ -106,25 +106,26 @@ async def getBilibiliFansCount():
     except:
         BILI_TOTALELEC = 0
 
-def getLiveRoomChat():
+async def getLiveRoomChat():
     global DANMU_ISSHOW
     global DANMU_LAST
     global DANMU_TEXT
     try:
-        res = requests.get('https://api.live.bilibili.com/xlive/web-room/v1/dM/gethistory?roomid='+BILI_LIVEID)
-        data = res.json()
+        async with httpx.AsyncClient() as client:
+            res = await client.get('https://api.live.bilibili.com/xlive/web-room/v1/dM/gethistory?roomid='+BILI_LIVEID)
+            data = res.json()
 
-        room = data['data']['room']
-        if len(room)>0:
-            last_danmu = room[len(room)-1]
-            last_danmu_time = time.mktime(time.strptime(last_danmu['timeline'], "%Y-%m-%d %H:%M:%S"))
-            if 'DANMU_LAST' in globals():
-                if DANMU_LAST == last_danmu:
-                    return None
-            if last_danmu_time>time.time()-300 or last_danmu['uid']!=BILI_MID:
-                DANMU_LAST = last_danmu
-                DANMU_TEXT = last_danmu['text']
-                DANMU_ISSHOW = 1
+            room = data['data']['room']
+            if len(room)>0:
+                last_danmu = room[len(room)-1]
+                last_danmu_time = time.mktime(time.strptime(last_danmu['timeline'], "%Y-%m-%d %H:%M:%S"))
+                if 'DANMU_LAST' in globals():
+                    if DANMU_LAST == last_danmu:
+                        return None
+                if last_danmu_time>time.time()-300 and last_danmu['uid']!=BILI_MID:
+                    DANMU_LAST = last_danmu
+                    DANMU_TEXT = last_danmu['text']
+                    DANMU_ISSHOW = 1
     except Exception as e:
         print(e)
 
@@ -139,19 +140,19 @@ def draw_danmu():
         text_fmt = my_font.render(DANMU_TEXT, 1, (255,255,255))
         text_width, text_height = my_font.size(DANMU_TEXT)
         screen.blit(text_fmt, (DANMU_X,60))
-        DANMU_X-=2
+        DANMU_X-=5
         if DANMU_X<-text_width:
             DANMU_ISSHOW = 0
             DANMU_ISRUNNING = 0
     else:
         DANMU_ISRUNNING = 1
         DANMU_X = SCREEN_WIDTH
-        Thread(target=pyttsx3.speak,args=(DANMU_TEXT,)).start()
+        # Thread(target=pyttsx3.speak,args=(DANMU_TEXT,)).start()
 
 
 def requestBiliData():
     asyncio.run(getBilibiliFansCount())
-    getLiveRoomChat()
+    asyncio.run(getLiveRoomChat())
 
 def draw_time():
     date_str = time.strftime("%Y 年 %m 月 %d 日", time.localtime())
@@ -259,6 +260,6 @@ def run_game():
     # game loop
     while True:
         game_loop()
-        fpsClock.tick(60)
+        fpsClock.tick(30)
 
 run_game()
