@@ -86,7 +86,7 @@ def run_game():
     pygame.init()
 
     global screen
-    screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))#pygame.FULLSCREEN
+    screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT),pygame.FULLSCREEN)#pygame.FULLSCREEN
 
     # 定义记秒事件
     global SECOND_EVT
