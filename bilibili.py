@@ -49,7 +49,10 @@ def draw_time():
     screen.blit(text_fmt, (240,10))
 
 def draw_ip():
-    ip_str = get_host_ip()
+    try:
+        ip_str = get_host_ip()
+    except:
+        ip_str = ""
     my_font = pygame.font.Font(FONT_PATH, 20)
     text_fmt = my_font.render(ip_str, 1, (255,255,255))
     text_width, text_height = my_font.size(ip_str)
