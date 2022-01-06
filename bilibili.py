@@ -42,6 +42,10 @@ DANMU_ISRUNNING = 0
 DANMU_TEXT = ''
 DANMU_X = 0
 
+# TTS
+engine = pyttsx3.init()
+engine.setProperty('rate', 140)
+
 def get_host_ip():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -70,8 +74,6 @@ async def getBilibiliFansCount():
                 "Content-Type": "application/json; charset=UTF-8"
             })
             data = res.json()
-
-            print(data)
             
             BILI_UNREAD = data['data']['unread']['at']+data['data']['unread']['chat']+data['data']['unread']['like']+data['data']['unread']['reply']+data['data']['unread']['sys_msg']+data['data']['unread']['up']
             BILI_TOTALELEC = data['data']['total']['elec']
@@ -116,7 +118,7 @@ def draw_danmu():
         my_font = pygame.font.Font(FONT_PATH, 220)
         text_fmt = my_font.render(DANMU_TEXT, 1, (255,255,255))
         text_width, text_height = my_font.size(DANMU_TEXT)
-        screen.blit(text_fmt, (DANMU_X,60))
+        screen.blit(text_fmt, (DANMU_X,(SCREEN_HEIGHT-text_height)/2))
         DANMU_X-=10
         if DANMU_X<-text_width:
             DANMU_ISSHOW = 0
@@ -161,12 +163,16 @@ def draw_ip():
     screen.blit(text_fmt, (SCREEN_WIDTH-text_width-10,10))
 
 def draw_bilibili():
-    # 绘制小破站Logo
-    screen.blit(image_logo, (30,50))
     # 绘制粉丝数
     my_font = pygame.font.Font(FONT_PATH, 220)
     text_fmt = my_font.render(str(BILI_TOTALFANS), 1, (255,255,255))
-    screen.blit(text_fmt, (380,60))
+    text_width, text_height = my_font.size(str(BILI_TOTALFANS))
+    text_x = (SCREEN_WIDTH-text_width)/2
+    text_y = (SCREEN_HEIGHT-text_height)/2
+    screen.blit(text_fmt, (text_x+160,text_y))
+
+    # 绘制小破站Logo
+    screen.blit(image_logo, (text_x-160,text_y-10))
     
     # 绘制其他信息 " 总播放："+str(BILI_TOTALVIEW)+" 总获赞："+str(BILI_TOTALLIKE)+
     my_font = pygame.font.Font(FONT_PATH, 20)
@@ -189,7 +195,8 @@ def game_loop():
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            sys.exit()
+            # sys.exit()
+            print('quit')
         if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     sys.exit()
@@ -207,19 +214,28 @@ def game_loop():
         draw_ip()
         draw_bilibili()
     
-    # 刷新识图
+    # 刷新视图
     pygame.display.update()
 
 def run_game():
     pygame.init()
+    # 隐藏鼠标
     pygame.mouse.set_visible(0)
 
     fpsClock = pygame.time.Clock()
 
+    # 获取系统分辨率
     global screen
+    global SCREEN_WIDTH
+    global SCREEN_HEIGHT
+    displayInfo = pygame.display.Info()
+    SCREEN_WIDTH = displayInfo.current_w
+    SCREEN_HEIGHT = displayInfo.current_h
+    
     # 0,0为自动识别系统分辨率
-    screen = pygame.display.set_mode((0, 0), pygame.NOFRAME)
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.NOFRAME)
     # pygame.display.toggle_fullscreen()
+    
 
     # 定义记秒事件
     global SECOND_EVT
@@ -231,6 +247,11 @@ def run_game():
     image_logo = pygame.transform.scale(image_logo, (300, 300))
 
     requestBiliData()
+
+    # global DANMU_ISSHOW
+    # global DANMU_TEXT
+    # DANMU_ISSHOW = 1
+    # DANMU_TEXT = "哈哈哈哈哈或或"
 
     # game loop
     while True:
