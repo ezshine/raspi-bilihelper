@@ -7,6 +7,7 @@ import socket
 import pyttsx3
 import httpx
 import asyncio
+import json
 
 # 全局变量
 TIME_SECOND = 0
@@ -26,7 +27,7 @@ BILI_MID = "422646817"
 BILI_LIVEID = "21759271"
 
 # 从B站cookie里获取
-BILI_SESSDATA = ""
+BILI_SESSDATA = "3ea2cef8%2C1656552588%2C5d28d%2A11"
 
 # bilibili
 BILI_UNREAD = 0  #未读消息
@@ -54,60 +55,33 @@ def get_host_ip():
 async def getBilibiliFansCount():
     global BILI_TOTALFANS
     global BILI_UNREAD
+    global BILI_LIVEID
     global BILI_LIVEONLINE
     global BILI_TOTALELEC
     global BILI_TOTALLIKE
     global BILI_TOTALVIEW
     try:
         async with httpx.AsyncClient() as client:
-            res = await client.get('https://api.bilibili.com/x/relation/stat?vmid='+BILI_MID)
-            data = res.json()
-            BILI_TOTALFANS = data['data']['follower']
-    except:
-        BILI_TOTALFANS = 0
-
-    try:
-        async with httpx.AsyncClient() as client:
-            res = await client.get('http://api.bilibili.com/x/msgfeed/unread',headers={
-                'Cookie':'SESSDATA='+BILI_SESSDATA
+            res = await client.post('https://e0b75de1-90c7-4c11-9d12-a8bc84c4d081.bspapp.com/http/bilibili',data=json.dumps({
+                "mid":BILI_MID,
+                "sessdata":BILI_SESSDATA,
+                "action":"getinfo"
+            }),headers={
+                "Content-Type": "application/json; charset=UTF-8"
             })
             data = res.json()
-            BILI_UNREAD = data['data']['at']+data['data']['chat']+data['data']['like']+data['data']['reply']+data['data']['sys_msg']+data['data']['up']
-    except:
-        BILI_UNREAD = 0
 
-    try:
-        async with httpx.AsyncClient() as client:
-            res = await client.get('https://api.bilibili.com/x/space/acc/info?mid='+BILI_MID)
-            data = res.json()
-            BILI_LIVEID = data['data']['live_room']['roomid']
-            BILI_LIVEONLINE = data['data']['live_room']['online']
+            print(data)
+            
+            BILI_UNREAD = data['data']['unread']['at']+data['data']['unread']['chat']+data['data']['unread']['like']+data['data']['unread']['reply']+data['data']['unread']['sys_msg']+data['data']['unread']['up']
+            BILI_TOTALELEC = data['data']['total']['elec']
+            BILI_TOTALFANS = data['data']['total']['follower']
+            BILI_TOTALLIKE = data['data']['total']['like']
+            BILI_TOTALVIEW = data['data']['total']['view']
+            BILI_LIVEONLINE = data['data']['liveroom']['online']
+            BILI_LIVEID = str(data['data']['liveroom']['roomid'])
     except:
-        BILI_LIVEONLINE = 0
-
-    try:
-        async with httpx.AsyncClient() as client:
-            res = await client.get('http://api.bilibili.com/x/space/upstat', cookies={
-                'SESSDATA':BILI_SESSDATA
-            },params={
-                'mid':BILI_MID
-            },headers={
-                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36'
-            })
-            data = res.json()
-            BILI_TOTALVIEW = data['data']['archive']['view']
-            BILI_TOTALLIKE = data['data']['likes']
-    except:
-        BILI_TOTALVIEW = 0
-        BILI_TOTALLIKE = 0
-
-    try:
-        async with httpx.AsyncClient() as client:
-            res = await client.get('https://api.bilibili.com/x/ugcpay-rank/elec/month/up?up_mid='+BILI_MID)
-            data = res.json()
-            BILI_TOTALELEC = data['data']['total']
-    except:
-        BILI_TOTALELEC = 0
+        print("err")
 
 async def getLiveRoomChat():
     global DANMU_ISSHOW
@@ -193,7 +167,7 @@ def draw_bilibili():
     my_font = pygame.font.Font(FONT_PATH, 220)
     text_fmt = my_font.render(str(BILI_TOTALFANS), 1, (255,255,255))
     screen.blit(text_fmt, (380,60))
-
+    
     # 绘制其他信息 " 总播放："+str(BILI_TOTALVIEW)+" 总获赞："+str(BILI_TOTALLIKE)+
     my_font = pygame.font.Font(FONT_PATH, 20)
     text_fmt = my_font.render("未读消息："+str(BILI_UNREAD), 1, (255,255,255))
