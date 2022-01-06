@@ -1,7 +1,6 @@
 import sys
 import os
 import pygame
-import requests
 from threading import Thread
 import time
 import socket
@@ -25,7 +24,9 @@ REQUEST_INTERVAL = 5
 # 哔哩哔哩配置
 BILI_MID = "422646817"
 BILI_LIVEID = "21759271"
-BILI_SESSDATA = "3ea2cef8%2C1656552588%2C5d28d%2A11"
+
+# 从B站cookie里获取
+BILI_SESSDATA = ""
 
 # bilibili
 BILI_UNREAD = 0  #未读消息
@@ -149,7 +150,8 @@ def draw_danmu():
     else:
         DANMU_ISRUNNING = 1
         DANMU_X = SCREEN_WIDTH
-        # Thread(target=pyttsx3.speak,args=(DANMU_TEXT,)).start()
+        # 在子线程里TTS
+        Thread(target=pyttsx3.speak,args=(DANMU_TEXT,)).start()
 
 
 def requestBiliData():
@@ -191,6 +193,7 @@ def draw_bilibili():
     my_font = pygame.font.Font(FONT_PATH, 220)
     text_fmt = my_font.render(str(BILI_TOTALFANS), 1, (255,255,255))
     screen.blit(text_fmt, (380,60))
+
     # 绘制其他信息 " 总播放："+str(BILI_TOTALVIEW)+" 总获赞："+str(BILI_TOTALLIKE)+
     my_font = pygame.font.Font(FONT_PATH, 20)
     text_fmt = my_font.render("未读消息："+str(BILI_UNREAD), 1, (255,255,255))
@@ -212,7 +215,7 @@ def game_loop():
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            print("quit")
+            sys.exit()
         if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     sys.exit()
@@ -240,6 +243,7 @@ def run_game():
     fpsClock = pygame.time.Clock()
 
     global screen
+    # 0,0为自动识别系统分辨率
     screen = pygame.display.set_mode((0, 0), pygame.NOFRAME)
     # pygame.display.toggle_fullscreen()
 
