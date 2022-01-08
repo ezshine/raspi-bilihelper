@@ -103,7 +103,7 @@ async def getLiveRoomChat():
                         return None
                 if last_danmu_time>time.time()-300 and last_danmu['uid']!=BILI_MID:
                     DANMU_LAST = last_danmu
-                    DANMU_TEXT = last_danmu['text']
+                    DANMU_TEXT = last_danmu['nickname']+"说"+last_danmu['text']
                     DANMU_ISSHOW = 1
     except Exception as e:
         print(e)
@@ -234,6 +234,7 @@ def run_game():
     
     # 0,0为自动识别系统分辨率
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.NOFRAME)
+    # 全屏这个api在树莓派下有点问题
     # pygame.display.toggle_fullscreen()
     
 
