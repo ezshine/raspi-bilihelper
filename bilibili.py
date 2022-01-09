@@ -27,7 +27,7 @@ BILI_MID = "422646817"
 BILI_LIVEID = "21759271"
 
 # 从B站cookie里获取
-BILI_SESSDATA = "3ea2cef8%2C1656552588%2C5d28d%2A11"
+BILI_SESSDATA = ""
 
 # bilibili
 BILI_UNREAD = 0  #未读消息
@@ -37,6 +37,7 @@ BILI_TOTALVIEW = 0  #总播放
 BILI_TOTALLIKE = 0 #总获赞
 BILI_TOTALELEC = 0 #总充电
 
+DANMU_LAST = {}
 DANMU_ISSHOW = 0
 DANMU_ISRUNNING = 0
 DANMU_TEXT = ''
@@ -135,9 +136,10 @@ def requestBiliData():
     asyncio.run(getLiveRoomChat())
 
 def draw_time():
-    date_str = time.strftime("%Y 年 %m 月 %d 日", time.localtime())
-    hm_str = time.strftime("%H:%M", time.localtime())
-    second_str = time.strftime("%S", time.localtime())
+    localtime = time.localtime()
+    date_str = time.strftime("%Y 年 %m 月 %d 日", localtime)
+    hm_str = time.strftime("%H:%M", localtime)
+    second_str = time.strftime("%S", localtime)
 
     my_font = pygame.font.Font(FONT_PATH, 20)
     text_fmt = my_font.render(date_str, 1, (255,255,255))
