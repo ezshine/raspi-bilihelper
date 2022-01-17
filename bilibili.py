@@ -1,13 +1,5 @@
-import sys
-import os
-import pygame
+import sys,os,pygame,time,pyttsx3,httpx,asyncio,json,socket
 from threading import Thread
-import time
-import socket
-import pyttsx3
-import httpx
-import asyncio
-import json
 
 # 全局变量
 TIME_SECOND = 0
@@ -109,6 +101,19 @@ async def getLiveRoomChat():
     except Exception as e:
         print(e)
 
+def send_live_msg():
+    # https://api.live.bilibili.com/msg/send
+    # bubble: 0
+    # msg: 嗯嗯
+    # color: 16777215
+    # mode: 1
+    # fontsize: 25
+    # rnd: 1642351832
+    # roomid: 21759271
+    # csrf: 8a089f1c156f0039d3987f9db91f55b7
+    # csrf_token: 8a089f1c156f0039d3987f9db91f55b7
+    t = ""
+
 def draw_danmu():
     global DANMU_ISRUNNING
     global DANMU_ISSHOW
@@ -145,7 +150,6 @@ def draw_time():
     text_fmt = my_font.render(date_str, 1, (255,255,255))
     screen.blit(text_fmt, (10,10))
 
-    my_font = pygame.font.Font(FONT_PATH, 20)
     text_fmt = my_font.render(hm_str, 1, (255,255,255))
     text_width, text_height = my_font.size(hm_str)
     screen.blit(text_fmt, (240,10))
@@ -183,7 +187,6 @@ def draw_bilibili():
     screen.blit(text_fmt, (10,SCREEN_HEIGHT-10-text_height))
 
     totalstr = " 总播放："+str(BILI_TOTALVIEW)+" 总获赞："+str(BILI_TOTALLIKE)+" 总充电："+str(BILI_TOTALELEC)+" 直播间人气："+str(BILI_LIVEONLINE)
-    my_font = pygame.font.Font(FONT_PATH, 20)
     text_fmt = my_font.render(totalstr, 1, (255,255,255))
     text_width, text_height = my_font.size(totalstr)
     screen.blit(text_fmt, (SCREEN_WIDTH-10-text_width,SCREEN_HEIGHT-10-text_height))
@@ -238,7 +241,6 @@ def run_game():
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.NOFRAME)
     # 全屏这个api在树莓派下有点问题
     # pygame.display.toggle_fullscreen()
-    
 
     # 定义记秒事件
     global SECOND_EVT
